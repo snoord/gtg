@@ -153,7 +153,7 @@ class Task(TreeNode):
         copy.content = self.content
         copy.tags = self.tags
         return copy
-    
+
     def duplicate_recursively(self):
         """ Duplicates recursively all the task itself and its children while keeping the relationship"""
         newtask = self.duplicate()
@@ -166,27 +166,28 @@ class Task(TreeNode):
                 child = self.req.get_task(c_tid)
                 if child.is_loaded():
                     newtask.add_child(child.duplicate_recursively())
-                    
+
         newtask.sync()
         return newtask.tid
 
- 
+
     # Return True if the title was changed.
     # False if the title was already the same.
     def set_title(self, title):
-        # We should check for other task with the same title
-        # In that case, we should add a number (like Tomboy does)
-        old_title = self.title
+        """Set the tasks title. Returns True if title was changed."""
+
         if title:
-            self.title = title.strip('\t\n')
+            title = title.strip('\t\n')
         else:
-            self.title = "(no title task)"
-        # Avoid unnecessary sync
-        if self.title != old_title:
+            title = '(no title task)'
+
+        # Avoid unnecessary syncing
+        if title == self.title:
+            return False
+        else:
+            self.title = title
             self.sync()
             return True
-        else:
-            return False
 
     # TODO: should we merge this function with set_title ?
     def set_complex_title(self, text, tags=[]):
@@ -231,7 +232,7 @@ class Task(TreeNode):
                         recurring = True
                         recurring_term = args
                     except:
-                        valid_attribute = False 
+                        valid_attribute = False
                 else:
                     # attribute is unknown
                     valid_attribute = False
@@ -264,12 +265,12 @@ class Task(TreeNode):
                     if c.get_status() in [self.STA_ACTIVE]:
                         c.set_status(status, donedate=donedate)
 
-                # If the task is recurring, it must be duplicate with 
+                # If the task is recurring, it must be duplicate with
                 # another task id and the next occurence of the task
                 # Furthermore, the duplicated task's parents
                 # should be set the the parent's previous task
                 # as well as the children's.
-                # Because we want every subtask that is recurring 
+                # Because we want every subtask that is recurring
                 # to occur another time after its parent has been set to done or dismiss.
                 # only recurring tasks without any recurring parent can be duplicated.
                 if self.recurring and not self.is_parent_recurring():
@@ -343,12 +344,12 @@ class Task(TreeNode):
 
     def set_recurring(self, recurring: bool, recurring_term: str=None, newtask=False):
         """Sets a task as recurring or not, and its recurring term.
-        
+
         Setting a task as recurrent implies that the
         children of a recurrent task will be also
-        set to recurrent and will inherit 
+        set to recurrent and will inherit
         their parent's recurring term
-        
+
         Args:
             recurring (bool): True if the task is recurring and False if not.
             recurring_term (str, optional): the recurring period of a task (every Monday, day..). Defaults to None.
@@ -385,8 +386,8 @@ class Task(TreeNode):
 
     def get_recurring_term(self):
         return self.recurring_term
-    
-    # 
+
+    #
     def inherit_recursion(self):
         """
             Inherits the recurrent state of the task's parent.
@@ -410,7 +411,7 @@ class Task(TreeNode):
               in this case, we need to deal with the issue of recurring task that recur on the same date.
               example: due_date is 09/09 and done_date is 09/09
         - if the task was marked after the due date, we need to figure out the next occurrence after the current date(today).
-        
+
         Raises:
             ValueError: if the recurring_term is invalid
 
@@ -435,7 +436,7 @@ class Task(TreeNode):
                 return next_date
             except:
                 raise ValueError(f'Invalid recurring term {self.recurring_term}')
-    
+
     def is_parent_recurring(self):
         if self.has_parent():
             for p_tid in self.get_parents():

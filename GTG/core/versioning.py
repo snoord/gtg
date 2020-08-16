@@ -163,5 +163,12 @@ def convert_task(task: et.Element, ds: datastore) -> Optional[et.Element]:
 def convert_content(content: str) -> str:
     """Convert a task contents to new format."""
 
-    # TODO: Implement this
+    # Tag tags arent' needed anymore
+    content = content.replace('</tag>', '')
+    content = content.replace('<tag>', '')
+
+    # New subtask style
+    content = content.replace('</subtask>', ' !}')
+    content = content.replace('<subtask>', '{! ')
+
     return content

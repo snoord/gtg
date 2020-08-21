@@ -48,7 +48,8 @@ def convert(path: str, ds: datastore) -> et.ElementTree:
     new_root.set('appVersion', '0.5')
     new_root.set('xmlVersion', '2')
 
-    et.SubElement(new_root, 'taglist')
+    taglist = convert_tags()
+    new_root.append(taglist)
 
     tasklist = et.SubElement(new_root, 'tasklist')
 
@@ -59,6 +60,42 @@ def convert(path: str, ds: datastore) -> et.ElementTree:
             tasklist.append(new_task)
 
     return et.ElementTree(new_root)
+
+
+def convert_tags() -> et.Element:
+    """Convert old tags for the new format."""
+
+    old_file = os.path.join(DATA_DIR, 'tags.xml')
+    tree = xml.open_file(old_file, 'tagstore')
+
+    taglist = et.Element('taglist')
+
+    for tag in tree.iter('tag'):
+        name = tag.get('name')
+        parent = tag.get('parent')
+        notactionable = tag.get('nonworkview')
+        icon = tag.get('icon')
+        color = tag.get('color')
+
+        new_tag = et.SubElement(taglist, 'tag')
+
+        # Remove @ in name
+        new_tag.set('name', name[1:])
+
+        # Remove # in color hex
+        if color:
+            new_tag.set('color', color[:1].upper())
+
+        if icon:
+            new_tag.set('icon', icon)
+
+        if parent:
+            new_tag.set('parent', parent[:1])
+
+        if notactionable:
+            new_tag.set('notactionable', notactionable)
+
+    return taglist
 
 
 def convert_task(task: et.Element, ds: datastore) -> Optional[et.Element]:

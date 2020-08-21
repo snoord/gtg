@@ -26,7 +26,7 @@ from GTG.core.dirs import DATA_DIR
 from GTG.core import xml
 from GTG.core import datastore
 
-from datetime import datetime
+from datetime import date
 from typing import Optional
 
 
@@ -119,14 +119,15 @@ def convert_task(task: et.Element, ds: datastore) -> Optional[et.Element]:
     if added:
         added = Date(added).xml_str()
     else:
-        added = datetime.now().isoformat()
+        added = date.today().isoformat()
 
     new_added.text = added
 
     if modified:
+        modified = modified[:10]
         modified = Date(modified).xml_str()
     else:
-        modified = datetime.now().isoformat()
+        modified = date.today().isoformat()
 
     new_modified.text = modified
 
@@ -148,9 +149,9 @@ def convert_task(task: et.Element, ds: datastore) -> Optional[et.Element]:
         due_date = Date(due_date)
 
         if due_date.is_fuzzy():
-            new_due = et.SubElement(dates, 'fuzzyStartDate')
+            new_due = et.SubElement(dates, 'fuzzyDueDate')
         else:
-            new_due = et.SubElement(dates, 'startDate')
+            new_due = et.SubElement(dates, 'dueDate')
 
         new_due.text = due_date.xml_str()
 

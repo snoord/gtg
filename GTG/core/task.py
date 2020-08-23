@@ -48,7 +48,7 @@ class Task(TreeNode):
         # tid is a string ! (we have to choose a type and stick to it)
         assert(isinstance(task_id, str) or isinstance(task_id, str))
         self.tid = str(task_id)
-        self.set_uuid(uuid.uuid4())
+        self.set_uuid(task_id)
         self.remote_ids = {}
         self.content = ""
         self.title = _("My new task")

@@ -60,7 +60,6 @@ gtg_editor_sources = [
   'editor/editor.py',
   'editor/serialize.py',
   'editor/taskview.py',
-  'editor/taskview2.py',
   'editor/text_tags.py',
 ]
 
